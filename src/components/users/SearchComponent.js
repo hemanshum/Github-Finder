@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
-const SearchComponent = () => {
+const SearchComponent = ({ searchUser, clearUsers, showClear }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const onChange = (e) => {
@@ -9,7 +10,8 @@ const SearchComponent = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    console.log(searchTerm);
+    searchUser(searchTerm);
+    setSearchTerm('');
   };
 
   return (
@@ -28,8 +30,19 @@ const SearchComponent = () => {
           className="btn btn-dark btn-block"
         />
       </form>
+      {showClear ? (
+        <button className="btn btn-light btn-block" onClick={clearUsers}>
+          Clear
+        </button>
+      ) : null}
     </div>
   );
+};
+
+SearchComponent.propTypes = {
+  searchUser: PropTypes.func.isRequired,
+  clearUsers: PropTypes.func.isRequired,
+  showClear: PropTypes.bool.isRequired,
 };
 
 export default SearchComponent;
