@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.css';
+
+import About from './components/pages/AboutPage';
+
 import Navbar from './components/layout/NavbarComponent';
-import User from './components/users/UsersComponent';
-import Search from './components/users/SearchComponent';
 import Alert from './components/layout/AlertComponent';
+
+import Users from './components/users/UsersComponent';
+import UserDetails from './components/users/UserComponent';
+import Search from './components/users/SearchComponent';
 
 function App() {
   const [users, setUsers] = useState([]);
+  const [user, setUser] = useState({});
   const [loading, setLoading] = useState(false);
   const [clearBtn, setClearBtn] = useState(false);
   const [showAlert, setShowAlert] = useState(null);
@@ -48,26 +55,61 @@ function App() {
     setTimeout(() => setShowAlert(null), 3000);
   };
 
+  //Get single GitHub User
+  const getUser = async (username) => {
+    const res = await axios.get(
+      `https://api.github.com/users/${username}?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+    );
+    setUser(res.data);
+  };
+
   useEffect(() => {
     setLoading(true);
     getUsers();
   }, []);
 
   return (
-    <div className="App">
-      <Navbar />
-      <div className="container">
-        <Alert alert={showAlert} />
-        <Search
-          searchUser={searchUser}
-          clearUsers={clearUsers}
-          showClear={clearBtn}
-          setAlert={setAlert}
-        />
-        {searchTerm !== '' ? <h2>You are searching '{searchTerm}' </h2> : null}
-        <User users={users} loading={loading} />
+    <Router>
+      <div className="App">
+        <Navbar />
+        <div className="container">
+          <Alert alert={showAlert} />
+          <Switch>
+            <Route
+              exact
+              path="/"
+              render={(props) => (
+                <React.Fragment>
+                  <Search
+                    searchUser={searchUser}
+                    clearUsers={clearUsers}
+                    showClear={clearBtn}
+                    setAlert={setAlert}
+                  />
+                  {searchTerm !== '' ? (
+                    <h2>Search Result for '{searchTerm}' </h2>
+                  ) : null}
+                  <Users users={users} loading={loading} />
+                </React.Fragment>
+              )}
+            />
+            <Route exact path="/about" component={About} />
+            <Route
+              exact
+              path="/user/:login"
+              render={(props) => (
+                <UserDetails
+                  {...props}
+                  getUser={getUser}
+                  user={user}
+                  loading={loading}
+                />
+              )}
+            />
+          </Switch>
+        </div>
       </div>
-    </div>
+    </Router>
   );
 }
 
