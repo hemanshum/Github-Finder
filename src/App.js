@@ -19,6 +19,7 @@ function App() {
   const [clearBtn, setClearBtn] = useState(false);
   const [showAlert, setShowAlert] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [userRepo, setUserRepo] = useState([]);
 
   const getUsers = async () => {
     const res = await axios.get(
@@ -63,6 +64,14 @@ function App() {
     setUser(res.data);
   };
 
+  //Get users Repos
+  const getUserRepo = async (username) => {
+    const res = await axios.get(
+      `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+    );
+    setUserRepo(res.data);
+  };
+
   useEffect(() => {
     setLoading(true);
     getUsers();
@@ -101,8 +110,10 @@ function App() {
                 <UserDetails
                   {...props}
                   getUser={getUser}
+                  getUserRepo={getUserRepo}
                   user={user}
                   loading={loading}
+                  repos={userRepo}
                 />
               )}
             />

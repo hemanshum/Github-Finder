@@ -1,11 +1,21 @@
 import React, { useEffect } from 'react';
-import Spinner from '../layout/SpinnerComponent';
 import { Link } from 'react-router-dom';
+import Spinner from '../layout/SpinnerComponent';
+import Repos from '../repos/ReposComponent';
 
-const UserComponent = ({ getUser, user, loading, match }) => {
+const UserComponent = ({
+  getUser,
+  user,
+  loading,
+  match,
+  getUserRepo,
+  repos,
+}) => {
+  const username = match.params.login;
   useEffect(() => {
-    getUser(match.params.login);
-  });
+    getUser(username);
+    getUserRepo(username);
+  }, []);
 
   const {
     name,
@@ -87,6 +97,7 @@ const UserComponent = ({ getUser, user, loading, match }) => {
         <div className="badge badge-light">Public Repos: {public_repos}</div>
         <div className="badge badge-dark">Publig Gists: {public_gists}</div>
       </div>
+      <Repos repos={repos} />
     </React.Fragment>
   );
 };
